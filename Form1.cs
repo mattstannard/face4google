@@ -363,125 +363,127 @@ namespace FootfallWithCamera
                     // Count the faces
                     NumberOfFaces = results.Count;
 
+                    // Only send if we have faces
+                    if (NumberOfFaces > 0)
+                    { 
                     
-                    // We build our Measurement Protocol Hit Payload
-                    // This sends the capture as a Pageview, you can change this to anything
-                    // This should be made into a function but for now its repeated to make it easier
-                    // to follow
-                    strGoogleAnalytics = "https://www.google-analytics.com/collect?";
-                    strGoogleAnalytics += "v=1&";
-                    strGoogleAnalytics += "t=pageview&";
-                    strGoogleAnalytics += "tid=" + Google_UA_Number + "&";
-                    strGoogleAnalytics += "cid=" + Google_Client_Id + "&";
+                        // We build our Measurement Protocol Hit Payload
+                        // This sends the capture as a Pageview, you can change this to anything
+                        // This should be made into a function but for now its repeated to make it easier
+                        // to follow
+                        strGoogleAnalytics = "https://www.google-analytics.com/collect?";
+                        strGoogleAnalytics += "v=1&";
+                        strGoogleAnalytics += "t=pageview&";
+                        strGoogleAnalytics += "tid=" + Google_UA_Number + "&";
+                        strGoogleAnalytics += "cid=" + Google_Client_Id + "&";
                        
-                    // We set our page level attributes
-                    strGoogleAnalytics += "dp=%2Fface%2Fcapture";
-                    strGoogleAnalytics += "&dt=FaceCapture%20" + NumberOfFaces.ToString() + "%20faces";
+                        // We set our page level attributes
+                        strGoogleAnalytics += "dp=%2Fface%2Fcapture";
+                        strGoogleAnalytics += "&dt=FaceCapture%20" + NumberOfFaces.ToString() + "%20faces";
 
-                    // And we increment Custom Metric 1 (Number of Faces)
-                    strGoogleAnalytics += "&cm1=" + NumberOfFaces.ToString();
+                        // And we increment Custom Metric 1 (Number of Faces)
+                        strGoogleAnalytics += "&cm1=" + NumberOfFaces.ToString();
 
-                    // We then use a Web Request to send this to the Google Servers
-                    webreq = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strGoogleAnalytics);
-                    webresp = null;
+                        // We then use a Web Request to send this to the Google Servers
+                        webreq = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strGoogleAnalytics);
+                        webresp = null;
 
-                    // We are using a GET requests
-                    webreq.Method = "GET";
-                    webreq.KeepAlive = true;
+                        // We are using a GET requests
+                        webreq.Method = "GET";
+                        webreq.KeepAlive = true;
 
-                    // We create the response, but do nothing with it (other than write it to debug!)
-                    webresp = webreq.GetResponse();
-                    stream3 = wresp.GetResponseStream();
-                    reader3 = new System.IO.StreamReader(stream3);
-                    strReturn = reader3.ReadToEnd();
+                        // We create the response, but do nothing with it (other than write it to debug!)
+                        webresp = webreq.GetResponse();
+                        stream3 = wresp.GetResponseStream();
+                        reader3 = new System.IO.StreamReader(stream3);
+                        strReturn = reader3.ReadToEnd();
 
-                    Debug.WriteLine(strReturn);
+                        Debug.WriteLine(strReturn);
 
-                    // We want to get the sex and age of each face as these are going 
-                    // to be different events, so we use an enumarator
-                    enm = results.GetEnumerator();
+                        // We want to get the sex and age of each face as these are going 
+                        // to be different events, so we use an enumarator
+                        enm = results.GetEnumerator();
 
-                    // This allows us to iterate faces!
-                    // And send an event for each face
-                    // Category : face capture
-                    // Action : Male / Female
-                    // Label : Age
-                    // With custom dimensions and metrics
+                        // This allows us to iterate faces!
+                        // And send an event for each face
+                        // Category : face capture
+                        // Action : Male / Female
+                        // Label : Age
+                        // With custom dimensions and metrics
 
-                    while (enm.MoveNext())
-                    {
-                        // Get our current face
-                        jtFace = enm.Current;
-
-                        try
+                        while (enm.MoveNext())
                         {
-                            // Read the gender attribute
-                            strSex = jtFace["gender"].ToString();
+                            // Get our current face
+                            jtFace = enm.Current;
 
-                            // Read the age attribute
-                            strAge = jtFace["age"].ToString();
-
-                            // We build our Measurement Protocol Hit Payload
-                            // This sends an event for
-                            strGoogleAnalytics = "https://www.google-analytics.com/collect?";
-                            strGoogleAnalytics += "v=1&";
-                            strGoogleAnalytics += "t=event&";
-                            strGoogleAnalytics += "tid=" + Google_UA_Number + "&";
-                            strGoogleAnalytics += "cid=" + Google_Client_Id + "&";
-                            
-                            // Set our event attributes
-                            strGoogleAnalytics += "ec=%2Fface%2Fcapture";
-                            strGoogleAnalytics += "&ea=" + strSex;
-                            strGoogleAnalytics += "&el=" + strAge;
-                            
-                            // Set Custom Dimension 1 to Age
-                            strGoogleAnalytics += "&cd1=" + strAge;
-
-                            // Set Custom Dimension 2 to Sex
-                            strGoogleAnalytics += "&cd2=" + strSex;
-
-                            // Set Custom Dimension 3 to the Date
-                            strGoogleAnalytics += "&cd3=" + DateTime.Now.ToString("yyyy-mm-dd");
-
-                            // Set Custom Dimension 4 to the Time
-                            strGoogleAnalytics += "&cd4=" + DateTime.Now.ToString("HH:mm:ss");
-                            
-                            // If it's Female we increment Custom Metric 2, otherwise we increment Custom Metric 3
-                            if (strSex == "Female")
+                            try
                             {
-                                strGoogleAnalytics += "&cm2=1";
+                                // Read the gender attribute
+                                strSex = jtFace["gender"].ToString();
+
+                                // Read the age attribute
+                                strAge = jtFace["age"].ToString();
+
+                                // We build our Measurement Protocol Hit Payload
+                                // This sends an event for
+                                strGoogleAnalytics = "https://www.google-analytics.com/collect?";
+                                strGoogleAnalytics += "v=1&";
+                                strGoogleAnalytics += "t=event&";
+                                strGoogleAnalytics += "tid=" + Google_UA_Number + "&";
+                                strGoogleAnalytics += "cid=" + Google_Client_Id + "&";
+                            
+                                // Set our event attributes
+                                strGoogleAnalytics += "ec=%2Fface%2Fcapture";
+                                strGoogleAnalytics += "&ea=" + strSex;
+                                strGoogleAnalytics += "&el=" + strAge;
+                            
+                                // Set Custom Dimension 1 to Age
+                                strGoogleAnalytics += "&cd1=" + strAge;
+
+                                // Set Custom Dimension 2 to Sex
+                                strGoogleAnalytics += "&cd2=" + strSex;
+
+                                // Set Custom Dimension 3 to the Date
+                                strGoogleAnalytics += "&cd3=" + DateTime.Now.ToString("yyyy-mm-dd");
+
+                                // Set Custom Dimension 4 to the Time
+                                strGoogleAnalytics += "&cd4=" + DateTime.Now.ToString("HH:mm:ss");
+                            
+                                // If it's Female we increment Custom Metric 2, otherwise we increment Custom Metric 3
+                                if (strSex == "Female")
+                                {
+                                    strGoogleAnalytics += "&cm2=1";
+                                }
+                                else
+                                {
+                                    strGoogleAnalytics += "&cm3=1";
+                                }
+
+                                // We then use a Web Request to send this to the Google Servers
+                                webreq = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strGoogleAnalytics);
+                                webresp = null;
+
+                                // We are using a GET requests
+                                webreq.Method = "GET";
+                                webreq.KeepAlive = true;
+
+                                // We create the response, but do nothing with it (other than write it to debug!)
+                                webresp = webreq.GetResponse();
+                                stream3 = wresp.GetResponseStream();
+                                reader3 = new System.IO.StreamReader(stream3);
+                                strReturn = reader3.ReadToEnd();
+
+                                Debug.WriteLine(strReturn);
+
                             
                             }
-                            else
+                            catch (Exception eFace)
                             {
-                                strGoogleAnalytics += "&cm3=1";
+                                // Uh oh, something wasn't right!
+                                Debug.WriteLine(eFace.ToString());
                             }
-
-                            // We then use a Web Request to send this to the Google Servers
-                            webreq = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strGoogleAnalytics);
-                            webresp = null;
-
-                            // We are using a GET requests
-                            webreq.Method = "GET";
-                            webreq.KeepAlive = true;
-
-                            // We create the response, but do nothing with it (other than write it to debug!)
-                            webresp = webreq.GetResponse();
-                            stream3 = wresp.GetResponseStream();
-                            reader3 = new System.IO.StreamReader(stream3);
-                            strReturn = reader3.ReadToEnd();
-
-                            Debug.WriteLine(strReturn);
-
-                            
                         }
-                        catch(Exception eFace)
-                        {
-                            // Uh oh, something wasn't right!
-                            Debug.WriteLine(eFace.ToString());
-                        }
-
-                    }
+                }
 
                     
                    
@@ -543,7 +545,7 @@ namespace FootfallWithCamera
         private void button3_Click(object sender, EventArgs e)
         {
             // This runs the count faces for a specfic named image
-            CountFaces("c:\\temp\\test-20164313114320.bmp");
+            CountFaces("c:\\temp\\test-20162315102355.bmp");
 
         }
         
